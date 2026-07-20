@@ -1,44 +1,77 @@
 # Pianpker · 落纸之间
 
 > 字落有间，读来无距。
+>
 > Less, between the lines.
 
-Pianpker 是 [Drag0nM](https://github.com/DRAG0NM) 的个人博客项目。它以文字阅读为中心，用克制的留白、和纸暖色、墨色层级与少量朱红建立安静而清晰的数字排版体验。
+<picture>
+  <source media="(max-width: 640px)" srcset="assets/images/v1/pianpker-zh-mobile.webp">
+  <img alt="Pianpker preview" src="assets/images/v1/pianpker-zh-desktop.webp">
+</picture>
 
-Pianpker is a personal blog by [Drag0nM](https://github.com/DRAG0NM), designed around quiet reading, deliberate whitespace, warm paper tones, layered ink colors, and restrained vermilion accents.
+[English](README.md) ｜ [简体中文](assets/docs/README.zh.md) ｜ [繁體中文](assets/docs/README.zh-tw.md) ｜ [日本語](assets/docs/README.ja.md) ｜ [Français](assets/docs/README.fr.md) ｜ [Русский](assets/docs/README.ru.md)
 
-## Design
+Pianpker is an independently maintained, multilingual static blog theme built with [Astro](https://astro.build/) and [UnoCSS](https://unocss.dev/). It is a deeply customized derivative of [Retypeset](https://github.com/radishzzz/astro-theme-retypeset), shaped around quiet reading, deliberate whitespace, warm paper tones, layered ink colors, and restrained vermilion accents.
 
-Pianpker 不追求表面的“日式”装饰，而把侘寂、幽玄、物哀、「间」、涩与简素作为排版方法：
-
-- 内容可以复杂，表现形式应尽可能简单；
-- 留白是积极的停顿，而不是等待填满的空位；
-- 朱红只承担交互反馈与印章式强调；
-- 不使用卡片堆叠、阴影、毛玻璃或饱和渐变制造设计感；
-- 每一个视觉元素、动画与数值都应有存在的理由。
+Pianpker（落纸之间）是一个以阅读为中心的多语言静态博客主题。它用克制的留白、和纸暖色、墨色层级与少量朱红，建立安静、清晰且可长期阅读的数字排版体验。
 
 ## Features
 
-- Astro 6 + UnoCSS
-- 简体中文、繁体中文、英语、法语、日语与俄语内容
-- 明亮与暗夜主题，支持 Astro ClientRouter
-- Markdown、MDX、KaTeX、Mermaid、目录与代码复制
-- 图片图注、画廊、缩放与外部媒体嵌入
-- RSS、Atom、Sitemap 与 Open Graph 分享图
-- 响应式布局与主题原色打印
-- 评论默认关闭
+- Astro 6 and UnoCSS
+- Simplified Chinese, Traditional Chinese, English, French, Japanese, and Russian content
+- Light and dark themes with Astro ClientRouter and view transitions
+- Refined multilingual typography and local font loading
+- Markdown, MDX, KaTeX, Mermaid, table of contents, and code copy
+- Image captions, galleries, zoom, and external media embeds
+- SEO, Sitemap, RSS, Atom, and Open Graph images
+- Responsive layout and theme-aware printing
+- Giscus, Twikoo, and Waline adapters, with comments disabled by default
 
-## Local development
+## Design
 
-Requires Node.js 22.12.0 or later and pnpm 10.33.0.
+Pianpker treats wabi-sabi, yūgen, mono no aware, and *ma* as editorial principles rather than decorative motifs:
+
+- content may be complex; its presentation should remain simple;
+- whitespace is an intentional pause, not an empty area to fill;
+- vermilion is reserved for interaction and seal-like emphasis;
+- cards, shadows, glass effects, and saturated gradients do not define the visual hierarchy;
+- every visible element, animation, and value should have a reason to exist.
+
+## Getting Started
+
+Use [this repository as a template](https://github.com/DRAG0NM/astro-theme-pianpker/generate), or clone it directly:
 
 ```bash
+git clone https://github.com/DRAG0NM/astro-theme-pianpker.git
+cd astro-theme-pianpker
+
 corepack enable
 pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Production verification:
+Requirements:
+
+- Node.js `22.12.0` or later
+- pnpm `10.33.0`
+
+Open `http://localhost:4321/` after the development server starts.
+
+## Configuration
+
+| Path | Purpose |
+| --- | --- |
+| [`src/config.ts`](src/config.ts) | Site identity, languages, theme, SEO, comments, and footer links |
+| [`src/content/posts/`](src/content/posts/) | Posts, examples, and localized guides |
+| [`src/content/about/`](src/content/about/) | Localized About pages |
+| [`public/icons/`](public/icons/) | Favicon and Open Graph logo |
+| [`public/fonts/`](public/fonts/) | Local fonts and font subsets |
+
+Start with the [Theme Guide](src/content/posts/guides/Theme%20Guide-en.md) before changing routing, transitions, font loading, or Markdown plugins.
+
+## Verification
+
+Run the complete local check before publishing:
 
 ```bash
 pnpm lint
@@ -47,29 +80,33 @@ pnpm build
 pnpm preview
 ```
 
-## Content
-
-- `src/content/posts/` — posts, examples, and localized guides
-- `src/content/about/` — localized About pages
-- `src/config.ts` — site identity, languages, theme, SEO, and footer links
-- `public/` — fonts, icons, and static assets
-
 ## Deployment
 
-The project is intended for static deployment on Cloudflare Pages.
+Pianpker is prepared for static deployment on [Cloudflare Pages](https://pages.cloudflare.com/):
 
-- Build command: `pnpm build`
-- Output directory: `dist`
-- Node.js: `22.12.0` or later
-- Planned site: [pianpker.pages.dev](https://pianpker.pages.dev)
+| Setting | Value |
+| --- | --- |
+| Build command | `pnpm build` |
+| Output directory | `dist` |
+| Node.js | `22.12.0` or later |
+| Package manager | pnpm `10.33.0` |
+
+The same static output can also be deployed to other platforms supported by the [Astro deployment guides](https://docs.astro.build/en/guides/deploy/).
 
 ## Acknowledgements
 
 Pianpker is an independently customized derivative of [Retypeset](https://github.com/radishzzz/astro-theme-retypeset) by [radishzz](https://github.com/radishzzz). Retypeset provided the original Astro architecture, content model, routing, typography foundation, and component system.
 
-The original copyright and permission notice are retained in [`LICENSE`](LICENSE). Changes made for Pianpker include its visual system, typography refinements, language set, font loading, theme and transition compatibility, printing, image handling, interaction details, branding, and publishing configuration.
+The original copyright and permission notice are retained in [`LICENSE`](LICENSE). A concise record of the derivative work and Pianpker-specific changes is available in [`NOTICE.md`](NOTICE.md).
 
-Additional inspiration and upstream components are credited in the source project and their respective files.
+Upstream inspiration and components include:
+
+- [Typography](https://github.com/moeyua/astro-theme-typography)
+- [Fuwari](https://github.com/saicaca/fuwari)
+- [Redefine](https://github.com/EvanNotFound/hexo-theme-redefine)
+- [AstroPaper](https://github.com/satnaing/astro-paper)
+- [heti](https://github.com/sivan/heti)
+- [EarlySummerSerif](https://github.com/GuiWonder/EarlySummerSerif)
 
 ## License
 
@@ -79,4 +116,4 @@ This repository retains the original [MIT License](LICENSE):
 Copyright (c) 2025 radishzz
 ```
 
-Pianpker-specific modifications are maintained by Drag0nM. The original MIT copyright and permission notice must remain with copies or substantial portions of the software.
+Pianpker-specific modifications are maintained by [Drag0nM](https://github.com/DRAG0NM). The original MIT copyright and permission notice must remain with copies or substantial portions of the software.
