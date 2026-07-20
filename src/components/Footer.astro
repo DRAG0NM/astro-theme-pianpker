@@ -1,0 +1,74 @@
+---
+import { themeConfig } from '@/config'
+import { getLangFromPath } from '@/i18n/lang'
+import { getLocalizedPath } from '@/i18n/path'
+
+const { author } = themeConfig.site
+const { links, startYear } = themeConfig.footer
+
+const currentYear = new Date().getFullYear()
+const year = Number(startYear) === currentYear
+  ? startYear
+  : `${startYear}-${currentYear}`
+
+const currentLang = getLangFromPath(Astro.url.pathname)
+const socialLinks = links.map(({ name, url }) => {
+  const isRSS = url === '/atom.xml' || url === '/rss.xml'
+  const isEmail = /^[\w.-]+@[\w.-]+\.[a-z]{2,}$/i.test(url)
+
+  if (isRSS) {
+    const localizedPath = getLocalizedPath(url, currentLang)
+    const href = import.meta.env.DEV
+      ? localizedPath
+      : localizedPath.slice(0, -1)
+
+    return {
+      name,
+      href,
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    }
+  }
+
+  if (isEmail) {
+    const href = `mailto:${url}`
+    return {
+      name,
+      href,
+      'data-umami-event': 'outbound-link-click',
+      'data-umami-event-url': href,
+    }
+  }
+
+  return {
+    name,
+    'href': url,
+    'target': '_blank',
+    'rel': 'noopener noreferrer',
+    'data-umami-event': 'outbound-link-click',
+    'data-umami-event-url': url,
+  }
+})
+---
+
+<footer
+  class="text-3 leading-1.25em font-navbar"
+  lg="uno-desktop-column bottom-20 text-3.5"
+>
+  <p>
+    {socialLinks.map((link, index) => (
+      <>
+        <a class="highlight-hover py-0.8 transition-colors after:bottom-0.35em hover:c-primary" {...link}>{link.name}</a>
+        {index < socialLinks.length - 1 && '/'}
+      </>
+    ))}
+  </p>
+
+  <p>
+    <span class="c-accent">© {year} {author}</span>
+  </p>
+
+  <p>
+    Built with <a class="highlight-hover py-0.8 transition-colors after:bottom-0.35em hover:c-primary" href="https://astro.build/" target="_blank" rel="noopener noreferrer" data-umami-event="outbound-link-click" data-umami-event-url="https://astro.build/">Astro</a>
+  </p>
+</footer>

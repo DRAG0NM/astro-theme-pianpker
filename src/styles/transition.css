@@ -1,0 +1,183 @@
+/* View Transition */
+@keyframes reveal {
+  from {
+    clip-path: inset(var(--from));
+  }
+}
+
+::view-transition-new(theme-toggle-transition) {
+  z-index: 99;
+  clip-path: inset(0 0 0 0);
+
+  /* Override Astro's wildcard reduced-motion reset only for the explicit
+   * theme transition. Button.astro still respects config.reduceMotion. */
+  animation: reveal 0.7s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+::view-transition-old(theme-toggle-transition) {
+  z-index: -1;
+  animation: none;
+}
+
+html.dark {
+  --from: 0 0 100% 0;
+}
+html:not(.dark) {
+  --from: 100% 0 0 0;
+}
+
+/* Disable animations for special elements during theme switching */
+html[data-theme-changing] [data-disable-theme-toggle-transition] {
+  view-transition-name: none !important;
+}
+
+/* Content Progressive Animation >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(3rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUpMini {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Keep normal content visible by default. Animation is opt-in so a failed
+ * stylesheet, unsupported animation, or late client-side navigation cannot
+ * leave content hidden. */
+@media (max-width: 1535px) {
+  html:not(.reduce-motion) #toc-container {
+    animation: fadeInUp 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) both;
+    animation-delay: 0.1s;
+  }
+}
+
+@media (min-width: 1024px) {
+  /* Astro marks shared elements with a reduced-motion animation reset.
+   * The project-level motion setting controls this entry animation instead. */
+  html:not(.reduce-motion) #post-date {
+    animation: fadeInUp 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) both !important;
+    animation-delay: 0.1s !important;
+  }
+
+  html:not(.reduce-motion) #back-button {
+    animation: fadeInLeft 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) both;
+    animation-delay: 0.2s;
+  }
+}
+
+html:not(.reduce-motion) #post-content > * {
+  animation: fadeInUp 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) both;
+}
+
+html:not(.reduce-motion) #post-content > *:nth-child(1) { animation-delay: 0.15s; }
+html:not(.reduce-motion) #post-content > *:nth-child(2) { animation-delay: 0.2s; }
+html:not(.reduce-motion) #post-content > *:nth-child(3) { animation-delay: 0.25s; }
+html:not(.reduce-motion) #post-content > *:nth-child(4) { animation-delay: 0.3s; }
+html:not(.reduce-motion) #post-content > *:nth-child(5) { animation-delay: 0.35s; }
+html:not(.reduce-motion) #post-content > *:nth-child(6) { animation-delay: 0.4s; }
+html:not(.reduce-motion) #post-content > *:nth-child(7) { animation-delay: 0.45s; }
+html:not(.reduce-motion) #post-content > *:nth-child(8) { animation-delay: 0.5s; }
+html:not(.reduce-motion) #post-content > *:nth-child(9) { animation-delay: 0.55s; }
+html:not(.reduce-motion) #post-content > *:nth-child(10) { animation-delay: 0.6s; }
+html:not(.reduce-motion) #post-content > *:nth-child(11) { animation-delay: 0.65s; }
+html:not(.reduce-motion) #post-content > *:nth-child(12) { animation-delay: 0.7s; }
+html:not(.reduce-motion) #post-content > *:nth-child(13) { animation-delay: 0.75s; }
+html:not(.reduce-motion) #post-content > *:nth-child(14) { animation-delay: 0.8s; }
+html:not(.reduce-motion) #post-content > *:nth-child(15) { animation-delay: 0.85s; }
+html:not(.reduce-motion) #post-content > *:nth-child(n+16) { animation-delay: 0.9s; }
+
+@media (max-width: 767px) {
+  html:not(.reduce-motion) #post-content > *:nth-child(n+8) {
+    animation: none;
+  }
+}
+
+@media (min-width: 1535px) {
+  html:not(.reduce-motion) #toc-desktop-icon {
+    animation: fadeInUpMini 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) both;
+    animation-delay: 0.175s;
+  }
+
+  html:not(.reduce-motion) #toc-links-list > * {
+    animation: fadeInUp 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) both;
+  }
+
+  html:not(.reduce-motion) #toc-links-list > *:nth-child(1) { animation-delay: 0.175s; }
+  html:not(.reduce-motion) #toc-links-list > *:nth-child(2) { animation-delay: 0.2s; }
+  html:not(.reduce-motion) #toc-links-list > *:nth-child(3) { animation-delay: 0.225s; }
+  html:not(.reduce-motion) #toc-links-list > *:nth-child(4) { animation-delay: 0.25s; }
+  html:not(.reduce-motion) #toc-links-list > *:nth-child(5) { animation-delay: 0.275s; }
+  html:not(.reduce-motion) #toc-links-list > *:nth-child(6) { animation-delay: 0.3s; }
+  html:not(.reduce-motion) #toc-links-list > *:nth-child(7) { animation-delay: 0.325s; }
+  html:not(.reduce-motion) #toc-links-list > *:nth-child(8) { animation-delay: 0.35s; }
+  html:not(.reduce-motion) #toc-links-list > *:nth-child(9) { animation-delay: 0.375s; }
+  html:not(.reduce-motion) #toc-links-list > *:nth-child(10) { animation-delay: 0.4s; }
+  html:not(.reduce-motion) #toc-links-list > *:nth-child(11) { animation-delay: 0.425s; }
+  html:not(.reduce-motion) #toc-links-list > *:nth-child(12) { animation-delay: 0.45s; }
+  html:not(.reduce-motion) #toc-links-list > *:nth-child(13) { animation-delay: 0.475s; }
+  html:not(.reduce-motion) #toc-links-list > *:nth-child(14) { animation-delay: 0.5s; }
+  html:not(.reduce-motion) #toc-links-list > *:nth-child(15) { animation-delay: 0.525s; }
+  html:not(.reduce-motion) #toc-links-list > *:nth-child(16) { animation-delay: 0.55s; }
+  html:not(.reduce-motion) #toc-links-list > *:nth-child(17) { animation-delay: 0.575s; }
+  html:not(.reduce-motion) #toc-links-list > *:nth-child(18) { animation-delay: 0.6s; }
+  html:not(.reduce-motion) #toc-links-list > *:nth-child(n+19) { animation-delay: 0.625s; }
+}
+
+/* Reduced motion must always leave every animated region fully visible. */
+html.reduce-motion #toc-container,
+html.reduce-motion #post-date,
+html.reduce-motion #post-content > *,
+html.reduce-motion #toc-desktop-icon,
+html.reduce-motion #toc-links-list > *,
+html.reduce-motion #back-button {
+  opacity: 1;
+  transform: none;
+  animation: none !important;
+}
+
+@media print {
+  #toc-container,
+  #post-date,
+  #post-content > *,
+  #toc-desktop-icon,
+  #toc-links-list > *,
+  #back-button {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+}
+
+/* Fallback Transition >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> */
+html.reduce-motion {
+  --at-apply: 'transition-colors duration-300 ease-out';
+
+  .highlight-hover,
+  .highlight-static {
+    --at-apply: 'transition-inherit';
+  }
+
+}

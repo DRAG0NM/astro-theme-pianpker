@@ -1,0 +1,43 @@
+---
+import GoBackIcon from '@/assets/icons/go-back.svg';
+---
+
+<button
+  id="back-button"
+  class="hidden"
+  lg="absolute left--10 top-3.8 block aspect-square w-4.5 c-secondary/60 transition-colors ease-out hover:c-primary active:scale-90!"
+  type="button"
+  aria-label="Go back"
+>
+  <GoBackIcon
+    aria-hidden="true"
+    fill="currentColor"
+  />
+</button>
+
+<!-- Go Back Script >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+<script>
+function handleBackButtonClick(e: MouseEvent) {
+  if (!(e.target instanceof Element)) {
+    return
+  }
+
+  if (!e.target.closest('#back-button')) {
+    return
+  }
+
+  // Navigate back if history exists
+  if (window.history.length > 1) {
+    window.history.back()
+    return
+  }
+
+  // Fallback to homepage
+  const siteTitleLink = document.getElementById('site-title-link')
+  if (siteTitleLink) {
+    siteTitleLink.click()
+  }
+}
+
+document.addEventListener('click', handleBackButtonClick)
+</script>

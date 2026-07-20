@@ -1,0 +1,137 @@
+---
+import type { MarkdownHeading } from 'astro'
+import TocIcon from '@/assets/icons/toc-icon.svg'
+import { ui } from '@/i18n/ui'
+import { getPageInfo } from '@/utils/page'
+
+interface Props {
+  headings: MarkdownHeading[]
+}
+
+const { currentLang } = getPageInfo(Astro.url.pathname)
+const currentUI = ui[currentLang as keyof typeof ui] ?? {}
+
+const { headings = [] } = Astro.props
+const filteredHeadings = headings.filter(heading => heading.depth >= 2 && heading.depth <= 4)
+---
+
+{filteredHeadings.length > 0 && (
+  // TOC Container
+  <div
+    id="toc-container"
+    class="mb-6 uno-round-border bg-secondary/5 2xl:(fixed left-0 top-44.5 max-w-[min(calc(50vw-38rem),13rem)] border-none bg-secondary/0)"
+  >
+    {/* Hidden Checkbox */}
+    <input
+      type="checkbox"
+      id="toc-toggle"
+      hidden
+    />
+    {/* TOC Toggle */}
+    <div class="relative h-12 w-full">
+      <label
+        for="toc-toggle"
+        class="absolute inset-0 flex cursor-pointer items-center 2xl:(static flex c-secondary/60 transition-colors ease-out hover:c-primary)"
+      >
+        {/* Title on Mobile */}
+        <span id="toc-mobile-text">
+          {currentUI.toc}
+        </span>
+
+        {/* Icon on Desktop */}
+        <TocIcon
+          id="toc-desktop-icon"
+          aria-hidden="true"
+          class="ml-4 hidden aspect-square w-4.2 2xl:(mt-4 block origin-center active:scale-90!)"
+          fill="currentColor"
+        />
+      </label>
+    </div>
+
+    {/* Expandable Content Wrapper with Accordion Animation */}
+    <div id="toc-accordion-wrapper">
+      <nav
+        id="toc-accordion-content"
+        aria-label="Table of Contents"
+      >
+        {/* TOC List */}
+        <ul id="toc-links-list">
+          {filteredHeadings.map(heading => (
+            <li
+              class:list={{
+                'ml-0': heading.depth === 2,
+                'ml-4': heading.depth === 3,
+                'ml-8': heading.depth === 4,
+              }}
+            >
+              <a
+                href={`#${heading.slug}`}
+                class:list={[
+                  { 'no-heti toc-links-h2': heading.depth === 2 },
+                  { 'no-heti toc-links-h3': heading.depth === 3 },
+                  { 'no-heti toc-links-h4': heading.depth === 4 },
+                ]}
+              >
+                {heading.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+  </div>
+)}
+
+<script>
+const is2xl = window.matchMedia('(min-width: 1536px)')
+
+let ticking = false
+let lastLink: Element | null = null
+
+// Find and scroll to the active link
+function scrollToActiveLink() {
+  const tocList = document.getElementById('toc-links-list')
+  if (!tocList) {
+    ticking = false
+    return
+  }
+
+  const activeLink = tocList.querySelector('a:target-current')
+  if (activeLink && activeLink !== lastLink) {
+    activeLink.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    lastLink = activeLink
+  }
+
+  ticking = false
+}
+
+// Throttle scroll events
+function handleScroll() {
+  if (!ticking && is2xl.matches) {
+    window.requestAnimationFrame(scrollToActiveLink)
+    ticking = true
+  }
+}
+
+// Initialize scroll listener
+function setupAutoScroll() {
+  ticking = false
+  lastLink = null
+
+  const tocList = document.getElementById('toc-links-list')
+  if (!tocList || !CSS.supports('selector(:target-current)')) {
+    return
+  }
+
+  document.addEventListener('scroll', handleScroll, { passive: true })
+}
+
+// Cleanup listener and reset state
+function cleanupAutoScroll() {
+  document.removeEventListener('scroll', handleScroll)
+  lastLink = null
+}
+
+document.addEventListener('astro:page-load', setupAutoScroll)
+document.addEventListener('astro:before-swap', cleanupAutoScroll)
+</script>

@@ -1,0 +1,127 @@
+---
+import 'lite-youtube-embed/src/lite-yt-embed.css'
+---
+
+<script>
+// Initialize Mermaid diagrams
+async function setupMermaidEmbeds() {
+  const mermaids = document.querySelectorAll('pre.mermaid')
+  if (mermaids.length === 0) {
+    return
+  }
+
+  // Store original code for re-rendering
+  mermaids.forEach((element) => {
+    const mermaid = element as HTMLElement
+    if (!mermaid.dataset.mermaidCode) {
+      mermaid.dataset.mermaidCode = mermaid.textContent?.trim() ?? ''
+    }
+  })
+
+  // Load and run Mermaid
+  try {
+    const { default: mermaid } = await import('mermaid')
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: document.documentElement.classList.contains('dark') ? 'dark' : 'default',
+    })
+    mermaid.run()
+  }
+  catch (error) {
+    console.error('[MediaEmbed] Failed to load Mermaid:', error)
+  }
+}
+
+// Load YouTube embed script
+async function setupYouTubeEmbeds() {
+  const youtube = document.querySelectorAll('lite-youtube')
+  if (youtube.length === 0) {
+    return
+  }
+
+  try {
+    // @ts-expect-error - No type definitions available for lite-youtube-embed
+    await import('lite-youtube-embed')
+  }
+  catch (error) {
+    console.error('[MediaEmbed] Failed to load YouTube embed:', error)
+  }
+}
+
+// Initialize Twitter widgets
+async function setupTweetEmbeds() {
+  const tweets = document.querySelectorAll('.twitter-tweet')
+  if (tweets.length === 0) {
+    return
+  }
+
+  tweets.forEach((tweet) => {
+    tweet.setAttribute('data-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light')
+  })
+
+  // Inject Twitter script
+  const script = document.createElement('script')
+  script.src = 'https://platform.twitter.com/widgets.js'
+  script.async = true
+  document.head.appendChild(script)
+}
+
+// Initialize all media embeds
+async function setupMediaEmbeds() {
+  await Promise.allSettled([
+    setupYouTubeEmbeds(),
+    setupTweetEmbeds(),
+    setupMermaidEmbeds(),
+  ])
+}
+
+// Re-render Mermaid diagrams on theme change
+function updateMermaidTheme() {
+  const mermaids = document.querySelectorAll('pre.mermaid[data-mermaid-code]')
+  if (mermaids.length === 0) {
+    return
+  }
+
+  const isDark = document.documentElement.classList.contains('dark')
+
+  import('mermaid').then(({ default: mermaid }) => {
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: isDark ? 'dark' : 'default',
+    })
+
+    // Reset content and re-run Mermaid
+    mermaids.forEach((element) => {
+      const mermaid = element as HTMLElement
+      mermaid.innerHTML = mermaid.dataset.mermaidCode ?? ''
+      mermaid.removeAttribute('data-processed')
+    })
+
+    mermaid.run()
+  }).catch((error) => {
+    console.error('[MediaEmbed] Failed to update Mermaid theme:', error)
+  })
+}
+
+// Handle horizontal scrolling for gallery
+function handleGalleryWheel(e: WheelEvent) {
+  const container = (e.target as Element)?.closest('.gallery-container') as HTMLElement
+  if (!container) {
+    return
+  }
+
+  // Convert vertical scroll to horizontal
+  const previousScrollLeft = container.scrollLeft
+  container.scrollLeft += e.deltaY
+  if (container.scrollLeft === previousScrollLeft) {
+    return
+  }
+
+  // Prevent default scroll only if horizontal scroll occurred
+  e.preventDefault()
+}
+
+document.addEventListener('astro:page-load', setupMediaEmbeds)
+document.addEventListener('theme-changed', updateMermaidTheme)
+document.addEventListener('wheel', handleGalleryWheel, { passive: false })
+</script>

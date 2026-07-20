@@ -1,0 +1,57 @@
+---
+import { ui } from '@/i18n/ui'
+import { getPageInfo } from '@/utils/page'
+
+const { currentLang, isHome, isPost, isTag, isAbout, getLocalizedPath } = getPageInfo(Astro.url.pathname)
+const currentUI = ui[currentLang as keyof typeof ui] ?? {}
+
+const isPostActive = isHome || isPost
+const isTagActive = isTag
+const isAboutActive = isAbout
+
+function getNavItemClass(isActive: boolean) {
+  return isActive
+    ? 'highlight-static c-primary font-bold after:bottom-0.7em'
+    : 'highlight-hover transition-[colors,font-weight] after:bottom-0.7em hover:(c-primary font-bold)'
+}
+
+const navItems = [
+  {
+    href: '/',
+    label: currentUI.posts,
+    className: getNavItemClass(isPostActive),
+  },
+  {
+    href: '/tags/',
+    label: currentUI.tags,
+    className: getNavItemClass(isTagActive),
+  },
+  {
+    href: '/about/',
+    label: currentUI.about,
+    className: getNavItemClass(isAboutActive),
+  },
+]
+---
+
+<nav
+  aria-label="Site Navigation"
+  class:list={[
+    'mb-8 text-3.6 font-normal leading-2.3em font-navbar',
+    'lg:(uno-desktop-column text-4 bottom-[min(9.04rem+3.85vw,12.5rem)]) cjk:tracking-normal',
+    isPost ? 'hidden lg:block' : '',
+  ]}
+>
+  <ul>
+    {navItems.map(item => (
+      <li>
+        <a
+          href={getLocalizedPath(item.href)}
+          class={item.className}
+        >
+          {item.label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>

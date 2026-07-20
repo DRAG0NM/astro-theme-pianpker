@@ -1,0 +1,265 @@
+<script>
+let overlay: HTMLDivElement | null = null
+let zoomedImg: HTMLImageElement | null = null
+let originalImg: HTMLImageElement | null = null
+let zoomClosing = false
+let zoomOutTimeout: number | null = null
+const MIN_ZOOM_SIZE = 100
+
+function canZoom(img: HTMLImageElement) {
+  return img.complete
+    && img.dataset.zoomError !== 'true'
+    && img.naturalWidth >= MIN_ZOOM_SIZE
+    && img.naturalHeight >= MIN_ZOOM_SIZE
+}
+
+function clearZoomSemantics(img: HTMLImageElement) {
+  if (img.dataset.zoomManaged !== 'true') {
+    return
+  }
+
+  img.removeAttribute('role')
+  img.removeAttribute('tabindex')
+  img.removeAttribute('aria-label')
+  delete img.dataset.zoomManaged
+}
+
+function updateZoomSemantics(img: HTMLImageElement) {
+  if (!canZoom(img)) {
+    clearZoomSemantics(img)
+    return
+  }
+
+  img.tabIndex = 0
+  img.setAttribute('role', 'button')
+  img.setAttribute('aria-label', img.alt ? `View image: ${img.alt}` : 'View image')
+  img.dataset.zoomManaged = 'true'
+}
+
+function bindImageState(img: HTMLImageElement) {
+  if (img.dataset.zoomBound === 'true') {
+    updateZoomSemantics(img)
+    return
+  }
+
+  img.dataset.zoomBound = 'true'
+
+  if (img.complete) {
+    if (img.naturalWidth === 0) {
+      img.dataset.zoomError = 'true'
+    }
+    updateZoomSemantics(img)
+    return
+  }
+
+  const onLoad = () => {
+    delete img.dataset.zoomError
+    updateZoomSemantics(img)
+  }
+  const onError = () => {
+    img.dataset.zoomError = 'true'
+    clearZoomSemantics(img)
+  }
+
+  img.addEventListener('load', onLoad, { once: true })
+  img.addEventListener('error', onError, { once: true })
+}
+
+function prepareZoomableImages() {
+  document.querySelectorAll<HTMLImageElement>('#post-content img').forEach((img) => {
+    bindImageState(img)
+  })
+}
+
+// Setup overlay element
+function setupOverlay() {
+  overlay?.remove()
+  overlay = document.createElement('div')
+  overlay.className = 'zoom-overlay'
+  overlay.setAttribute('role', 'dialog')
+  overlay.setAttribute('aria-modal', 'true')
+  overlay.setAttribute('aria-label', 'Image Viewer')
+  overlay.setAttribute('tabindex', '-1')
+
+  document.body.appendChild(overlay)
+  prepareZoomableImages()
+}
+
+// Clean up zoom state
+function cleanupZoom() {
+  if (zoomOutTimeout !== null) {
+    window.clearTimeout(zoomOutTimeout)
+    zoomOutTimeout = null
+  }
+  document.body.style.overflow = ''
+  zoomedImg?.remove()
+  overlay?.remove()
+  overlay = null
+  zoomedImg = null
+  originalImg = null
+  zoomClosing = false
+}
+
+// Zoom in the image
+function zoomIn(img: HTMLImageElement) {
+  if (!overlay) {
+    return
+  }
+
+  // Disable scrolling and get position
+  document.body.style.overflow = 'hidden'
+  const rect = img.getBoundingClientRect()
+  originalImg = img
+
+  // Clone and setup image
+  zoomedImg = img.cloneNode() as HTMLImageElement
+  zoomedImg.className = 'zoom-img'
+  zoomedImg.removeAttribute('id')
+  zoomedImg.removeAttribute('loading')
+  zoomedImg.removeAttribute('role')
+  zoomedImg.removeAttribute('tabindex')
+  zoomedImg.removeAttribute('aria-label')
+  zoomedImg.setAttribute('aria-hidden', 'true')
+  delete zoomedImg.dataset.zoomManaged
+  delete zoomedImg.dataset.zoomBound
+  delete zoomedImg.dataset.zoomError
+
+  zoomedImg.style.top = `${rect.top}px`
+  zoomedImg.style.left = `${rect.left}px`
+  zoomedImg.style.width = `${rect.width}px`
+  zoomedImg.style.height = `${rect.height}px`
+
+  // Add to DOM and show
+  document.body.appendChild(zoomedImg)
+  overlay.style.display = 'block'
+  overlay.focus()
+
+  // Calculate scale and position
+  const viewportWidth = window.innerWidth
+  const viewportHeight = window.innerHeight
+  const scaleFactor = window.innerWidth < 768 ? 1 : 0.8
+  const scale = Math.min(
+    (viewportWidth * scaleFactor) / rect.width,
+    (viewportHeight * scaleFactor) / rect.height,
+  )
+  const translateX = (-rect.left + (viewportWidth - rect.width) / 2) / scale
+  const translateY = (-rect.top + (viewportHeight - rect.height) / 2) / scale
+
+  // Start animation
+  requestAnimationFrame(() => {
+    if (overlay) {
+      overlay.style.opacity = '1'
+    }
+
+    if (zoomedImg) {
+      zoomedImg.style.transform = `scale(${scale}) translate3d(${translateX}px, ${translateY}px, 0)`
+    }
+  })
+}
+
+// Zoom out the image
+function zoomOut() {
+  if (!overlay || !zoomedImg || !originalImg || zoomClosing) {
+    return
+  }
+
+  zoomClosing = true
+  const imageToClose = zoomedImg
+  const overlayToClose = overlay
+  const originalImage = originalImg
+
+  // Start closing animation
+  zoomedImg.style.transform = ''
+  overlay.style.opacity = '0'
+  document.body.style.overflow = ''
+
+  // Define cleanup logic
+  const cleanup = () => {
+    if (zoomOutTimeout !== null) {
+      window.clearTimeout(zoomOutTimeout)
+      zoomOutTimeout = null
+    }
+
+    // Remove zoomed image
+    imageToClose.remove()
+    if (zoomedImg === imageToClose) {
+      zoomedImg = null
+    }
+
+    // Hide overlay
+    if (overlay === overlayToClose) {
+      overlayToClose.style.display = 'none'
+    }
+
+    // Restore focus
+    if (originalImg === originalImage) {
+      originalImage.focus({ preventScroll: true })
+      originalImg = null
+    }
+
+    zoomClosing = false
+  }
+
+  if (document.documentElement.classList.contains('reduce-motion')) {
+    cleanup()
+    return
+  }
+
+  // Listen for transition end to cleanup
+  imageToClose.addEventListener('transitionend', cleanup, { once: true })
+  zoomOutTimeout = window.setTimeout(cleanup, 350)
+}
+
+// Handle click events
+function handleClick(event: MouseEvent) {
+  if (zoomedImg) {
+    zoomOut()
+    return
+  }
+
+  const target = event.target
+  if (!(target instanceof HTMLImageElement)) {
+    return
+  }
+
+  // Ignore small or incomplete images
+  if (!canZoom(target)) {
+    return
+  }
+
+  event.preventDefault()
+  zoomIn(target)
+}
+
+function handleKeydown(event: KeyboardEvent) {
+  if (zoomedImg) {
+    if (event.key === 'Escape') {
+      event.preventDefault()
+      zoomOut()
+    }
+    else if (event.key === 'Tab') {
+      event.preventDefault()
+      overlay?.focus()
+    }
+    return
+  }
+
+  const target = document.activeElement
+  if (!(target instanceof HTMLImageElement) || (event.key !== 'Enter' && event.key !== ' ')) {
+    return
+  }
+
+  if (!canZoom(target)) {
+    return
+  }
+
+  event.preventDefault()
+  zoomIn(target)
+}
+
+document.addEventListener('astro:page-load', setupOverlay)
+document.addEventListener('astro:before-swap', cleanupZoom)
+document.addEventListener('click', handleClick)
+document.addEventListener('keydown', handleKeydown)
+window.addEventListener('resize', zoomOut)
+</script>

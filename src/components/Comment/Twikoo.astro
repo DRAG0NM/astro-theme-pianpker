@@ -1,0 +1,114 @@
+---
+import twikooCSS from 'twikoo/dist/twikoo.css?url'
+import twikooJS from 'twikoo/dist/twikoo.nocss.js?url' // Using twikoo.min.js causes CSS loading failure after page switching
+import { allLocales, base, defaultLocale, themeConfig } from '@/config'
+import { twikooLocaleMap } from '@/i18n/config'
+
+const { envId = '' } = themeConfig.comment.twikoo ?? {}
+
+// Remove locale prefix from path
+const currentPath = Astro.url.pathname
+const localePattern = new RegExp(`\\/(${allLocales.join('|')})\\/`)
+const twikooPath = currentPath.replace(localePattern, '/')
+
+// Determine language
+const pathWithoutBase = base && currentPath.startsWith(base)
+  ? currentPath.slice(base.length)
+  : currentPath
+const matchedLang = Object.keys(twikooLocaleMap).find(code => pathWithoutBase.startsWith(`/${code}/`))
+const lang = (matchedLang ?? defaultLocale) as keyof typeof twikooLocaleMap
+
+const twikooConfig = {
+  envId,
+  path: twikooPath,
+  lang: twikooLocaleMap[lang],
+  twikooCSS,
+}
+---
+
+<!-- Class not working on twikoo div -->
+<div
+  id="twikoo-wrapper"
+  class="no-heti mt-16"
+  data-config={JSON.stringify(twikooConfig)}
+>
+  <div id="twikoo" />
+</div>
+
+<!-- Twikoo Script >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+<script
+  is:inline
+  src={twikooJS}
+></script>
+
+<script>
+declare const twikoo: any
+
+let twikooObserver: IntersectionObserver | null = null
+let twikooWrapper: HTMLElement | null = null
+
+function setupTwikoo() {
+  const twikooWrapper = document.getElementById('twikoo-wrapper')
+  if (!twikooWrapper || !twikooWrapper.dataset.config) {
+    return
+  }
+
+  try {
+    const config = JSON.parse(twikooWrapper.dataset.config)
+    const { envId, path, lang } = config
+
+    twikoo.init({
+      envId,
+      el: '#twikoo',
+      // region: 'ap-shanghai', // Specify for Tencent Cloud, omit for Vercel
+      path,
+      lang,
+    })
+  }
+  catch (error) {
+    console.error('[Twikoo] Failed to initialize:', error)
+  }
+}
+
+// Lazy load Twikoo when the wrapper enters viewport
+function lazySetupTwikoo() {
+  twikooWrapper = document.getElementById('twikoo-wrapper')
+  if (!twikooWrapper || !twikooWrapper.dataset.config) {
+    return
+  }
+
+  const config = JSON.parse(twikooWrapper.dataset.config)
+  const { twikooCSS } = config
+
+  if (!document.getElementById('twikoo-css')) {
+    const link = document.createElement('link')
+    link.id = 'twikoo-css'
+    link.rel = 'stylesheet'
+    link.href = twikooCSS
+    document.head.appendChild(link)
+  }
+
+  twikooObserver = new IntersectionObserver((entries) => {
+    if (entries.some(entry => entry.isIntersecting)) {
+      setupTwikoo()
+      twikooObserver?.disconnect()
+      twikooObserver = null
+    }
+  }, { rootMargin: '500px' })
+
+  twikooObserver.observe(twikooWrapper)
+}
+
+function cleanupTwikoo() {
+  twikooObserver?.disconnect()
+  twikooObserver = null
+
+  if (twikooWrapper) {
+    twikooWrapper.innerHTML = ''
+    twikooWrapper = null
+  }
+}
+
+document.addEventListener('astro:page-load', lazySetupTwikoo)
+document.addEventListener('astro:before-swap', cleanupTwikoo)
+</script>

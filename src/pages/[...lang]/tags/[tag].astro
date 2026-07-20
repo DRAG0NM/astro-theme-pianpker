@@ -1,0 +1,46 @@
+---
+import PostList from '@/components/PostList.astro'
+import TagList from '@/components/TagList.astro'
+import { allLocales } from '@/config'
+import { getLangFromLocale, getLangRouteParam } from '@/i18n/lang'
+import Layout from '@/layouts/Layout.astro'
+import { getAllTags, getPostsByTag, getTagSupportedLangs } from '@/utils/content'
+
+export async function getStaticPaths() {
+  const paths = await Promise.all(allLocales.map(async (lang) => {
+    const langTags = await getAllTags(lang)
+    return langTags.map(tag => ({
+      params: { lang: getLangRouteParam(lang), tag },
+      props: { tag },
+    }))
+  }))
+  return paths.flat()
+}
+
+interface Props {
+  tag: string
+}
+
+const { tag } = Astro.props
+const currentLang = getLangFromLocale(Astro.currentLocale)
+const posts = await getPostsByTag(tag, currentLang)
+const allTags = await getAllTags(currentLang)
+const supportedLangs = await getTagSupportedLangs(tag)
+---
+
+<Layout supportedLangs={supportedLangs}>
+  <!-- Decorative Line -->
+  <div class="uno-decorative-line" />
+  <!-- Tag List -->
+  <TagList
+    tags={allTags}
+    currentTag={tag}
+    lang={currentLang}
+  />
+
+  <!-- Posts List -->
+  <PostList
+    posts={posts}
+    lang={currentLang}
+  />
+</Layout>

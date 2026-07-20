@@ -1,0 +1,61 @@
+---
+import { themeConfig } from '@/config'
+import { ui } from '@/i18n/ui'
+import { getPageInfo } from '@/utils/page'
+
+const { currentLang, getLocalizedPath, isPost } = getPageInfo(Astro.url.pathname)
+const { title, subtitle, i18nTitle } = themeConfig.site
+
+const currentUI = ui[currentLang as keyof typeof ui] ?? {}
+const headerTitle = i18nTitle ? currentUI.title : title
+const headerSubtitle = i18nTitle ? currentUI.subtitle : subtitle
+
+const TitleTag = isPost ? 'h2' : 'h1'
+const SubtitleTag = isPost ? 'div' : 'h2'
+---
+
+<header
+  class:list={[
+    'lg:(uno-desktop-column top-21)',
+    isPost
+    ? 'mb-8.5'
+    : 'mb-8',
+  ]}
+>
+  <TitleTag
+    class:list={[
+      'font-bold font-title',
+      isPost
+        ? `mb-2.8 mt-3 text-5.375 c-secondary lg:(mb-1.8 mt-0 text-9 c-primary)`
+        : `mb-1.8 w-75% text-8 c-primary lg:(w-full text-9)`,
+    ]}
+  >
+    <!-- Fix text cropping issues during view transition on iOS by adding a div tag -->
+      <div
+        class="box-content inline-block pr-1"
+        transition:name={`site-title-${currentLang}`}
+        data-disable-theme-toggle-transition
+      >
+      <a
+        id="site-title-link"
+        href={getLocalizedPath('/')}
+      >
+          {headerTitle}
+      </a>
+    </div>
+  </TitleTag>
+
+  {headerSubtitle && (
+    <SubtitleTag
+      class:list={[
+        'text-3.5 c-secondary font-navbar lg:text-4',
+        isPost
+        ? `op-0 lg:op-100`
+        : 'w-75% lg:w-full',
+      ]}
+      aria-hidden={isPost}
+    >
+      {headerSubtitle}
+    </SubtitleTag>
+  )}
+</header>

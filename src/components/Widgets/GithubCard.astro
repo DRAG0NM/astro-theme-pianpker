@@ -1,0 +1,110 @@
+<script>
+interface GithubRepoData {
+  owner: { avatar_url: string }
+  description: string | null
+  stargazers_count: number
+  forks_count: number
+  license: { spdx_id: string } | null
+}
+
+const compactNumberFormat = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 })
+
+// Fetch repository data from GitHub API with caching
+async function fetchRepoData(repo: string): Promise<GithubRepoData | null> {
+  const cacheKey = `github-repo-${repo}`
+
+  // Check session storage for cached data
+  try {
+    const cachedData = sessionStorage.getItem(cacheKey)
+    if (cachedData) {
+      return JSON.parse(cachedData) as GithubRepoData
+    }
+  }
+  catch {
+    try {
+      sessionStorage.removeItem(cacheKey)
+    }
+    catch {}
+  }
+
+  // Fetch from API if not cached
+  try {
+    const response = await fetch(`https://api.github.com/repos/${repo}`)
+    if (!response.ok) {
+      console.warn(`[GithubCard] Failed to fetch ${repo}: ${response.status} ${response.statusText}`)
+      return null
+    }
+
+    const raw = await response.json()
+    const data: GithubRepoData = {
+      owner: { avatar_url: raw.owner?.avatar_url },
+      description: raw.description,
+      stargazers_count: raw.stargazers_count,
+      forks_count: raw.forks_count,
+      license: raw.license ? { spdx_id: raw.license.spdx_id } : null,
+    }
+
+    // Cache the successful response
+    try {
+      sessionStorage.setItem(cacheKey, JSON.stringify(data))
+    }
+    catch {}
+
+    return data
+  }
+  catch (error) {
+    console.error(`[GithubCard] Failed to fetch ${repo}:`, error)
+    return null
+  }
+}
+
+// Update card UI with repository data
+function updateCardUI(card: HTMLElement, data: GithubRepoData | null) {
+  const setText = (selector: string, text: string) => {
+    const el = card.querySelector<HTMLElement>(selector)
+    if (el) {
+      el.textContent = text
+    }
+  }
+
+  if (!data) {
+    setText('.gc-repo-description', 'Failed to load data')
+    return
+  }
+
+  const avatar = card.querySelector<HTMLElement>('.gc-owner-avatar')
+  if (avatar && data.owner?.avatar_url) {
+    avatar.style.backgroundImage = `url(${data.owner.avatar_url})`
+  }
+
+  setText('.gc-repo-description', data.description ?? 'No description')
+  setText('.gc-stars-count', compactNumberFormat.format(data.stargazers_count ?? 0))
+  setText('.gc-forks-count', compactNumberFormat.format(data.forks_count ?? 0))
+  setText('.gc-license-info', data.license?.spdx_id ?? 'No License')
+}
+
+// Load data for a specific card element
+async function loadRepoData(card: HTMLElement) {
+  const repo = card.dataset.repo
+  if (!repo) {
+    return
+  }
+
+  const data = await fetchRepoData(repo)
+  updateCardUI(card, data)
+}
+
+// Initialize all GitHub cards on the page
+function setupGithubCards() {
+  const cards = document.querySelectorAll<HTMLElement>('.gc-container')
+  if (cards.length === 0) {
+    return
+  }
+
+  cards.forEach((card) => {
+    loadRepoData(card)
+  })
+}
+
+document.addEventListener('astro:page-load', setupGithubCards)
+</script>

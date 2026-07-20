@@ -1,0 +1,200 @@
+---
+import { ClientRouter } from 'astro:transitions'
+import katexCSS from 'katex/dist/katex.min.css?url'
+import { allLocales, base, defaultLocale, themeConfig } from '@/config'
+import { ui } from '@/i18n/ui'
+import { getPageInfo } from '@/utils/page'
+
+interface Props {
+  postTitle?: string
+  postDescription?: string
+  postSlug?: string
+}
+
+// Props and Language
+const { postTitle, postDescription, postSlug } = Astro.props
+const { currentLang } = getPageInfo(Astro.url.pathname)
+const currentUI = ui[currentLang as keyof typeof ui] ?? {}
+
+// Site Configuration
+const { title, subtitle, description, i18nTitle, author, favicon } = themeConfig.site
+const { mode: defaultMode, light: { background: lightMode }, dark: { background: darkMode } } = themeConfig.color
+const { katex: katexEnabled, reduceMotion } = themeConfig.global
+const { verification = {}, twitterID = '', googleAnalyticsID = '', umamiAnalyticsID = '' } = themeConfig.seo ?? {}
+const { google = '', bing = '', yandex = '', baidu = '' } = verification
+const { customGoogleAnalyticsJS = '', customUmamiAnalyticsJS = '' } = themeConfig.preload ?? {}
+
+// Site Metadata
+const metaTheme = defaultMode === 'dark' ? darkMode : lightMode
+const siteTitle = i18nTitle ? currentUI.title : title
+const siteSubtitle = i18nTitle ? currentUI.subtitle : subtitle
+const siteDescription = i18nTitle ? currentUI.description : description
+
+// Page Metadata
+const pageTitle = postTitle ? `${postTitle} | ${siteTitle}` : `${siteTitle} - ${siteSubtitle}`
+const pageDescription = postDescription || siteDescription
+const pageImage = postSlug
+  ? new URL(`${base}/og/${postSlug}.png`, Astro.url.origin)
+  : new URL(`${base}/icons/og-logo.png`, themeConfig.site.url)
+---
+
+<head>
+<!-- Basic Info -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+{favicon.toLowerCase().endsWith('.svg') && <link rel="icon" type="image/svg+xml" href={`${base}${favicon}`} />}
+{favicon.toLowerCase().endsWith('.png') && <link rel="icon" type="image/png" href={`${base}${favicon}`} />}
+{favicon.toLowerCase().endsWith('.ico') && <link rel="icon" type="image/x-icon" href={`${base}${favicon}`} />}
+<title>{pageTitle}</title>
+<meta name="description" content={pageDescription} />
+<meta name="author" content={author} />
+<meta name="generator" content={Astro.generator} />
+<meta name="theme-color" content={metaTheme} />
+
+<!-- Preload -->
+<link rel="preload" href={`${base}/fonts/EarlySummer-VF-Split/EarlySummer-VF-Subset.woff2`} as="font" type="font/woff2" crossorigin />
+<link rel="preload" href={`${base}/fonts/Snell-Black-SF.woff2`} as="font" type="font/woff2" crossorigin />
+<link rel="preload" href={`${base}/fonts/Snell-Bold-SF.woff2`} as="font" type="font/woff2" crossorigin />
+<link rel="preload" href={`${base}/fonts/STIX-VF.woff2`} as="font" type="font/woff2" crossorigin />
+<link rel="preload" href={`${base}/fonts/STIX-Italic-VF.woff2`} as="font" type="font/woff2" crossorigin />
+{katexEnabled && <link rel="stylesheet" href={katexCSS} media="print" onload={`this.media='all'`} />}
+
+<!-- Site Links -->
+<link rel="canonical" href={Astro.url} />
+<link rel="sitemap" href={`${base}/sitemap-index.xml`} />
+<link rel="alternate" href={`${base}/rss.xml`} type="application/rss+xml" title="RSS Feed" />
+<link rel="alternate" href={`${base}/atom.xml`} type="application/atom+xml" title="Atom Feed" />
+{allLocales.map(lang => (
+  <link
+    rel="alternate"
+    href={`${Astro.url.origin}${base}${lang === defaultLocale ? '' : `/${lang}/`}`}
+    hreflang={lang === 'zh-tw' ? 'zh-TW' : lang}
+  />
+))}
+
+<!-- Open Graph -->
+<meta property="og:type" content={postTitle ? 'article' : 'website'} />
+<meta property="og:url" content={Astro.url} />
+<meta property="og:title" content={pageTitle} />
+<meta property="og:description" content={pageDescription} />
+<meta property="og:image" content={pageImage} />
+<meta name="twitter:card" content="summary_large_image" />
+{twitterID && <meta name="twitter:site" content={twitterID} />}
+
+<!-- Site Verification -->
+{google && <meta name="google-site-verification" content={google} />}
+{bing && <meta name="msvalidate.01" content={bing} />}
+{yandex && <meta name="yandex-verification" content={yandex} />}
+{baidu && <meta name="baidu-site-verification" content={baidu} />}
+
+<!-- Global View Transition -->
+<ClientRouter fallback="none" />
+
+<!-- Theme Toggle -->
+<script
+  is:inline
+  define:vars={{
+    defaultMode,
+    lightMode,
+    darkMode,
+    reduceMotion,
+ }}
+>
+(function () {
+  // Check if current theme is dark
+  // Priority: localStorage theme > default theme > system preference
+  function isCurrentDark() {
+    const currentTheme = localStorage.getItem('theme')
+    if (currentTheme === 'dark' || currentTheme === 'light') {
+      return currentTheme === 'dark'
+    }
+
+    if (defaultMode !== 'auto') {
+      return defaultMode === 'dark'
+    }
+
+    // If defaultMode is auto, follow system preference
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
+  }
+
+  // Initialize theme
+  function initTheme(doc = document) {
+    const isDark = isCurrentDark()
+    const root = doc.documentElement
+    root.classList.toggle('dark', isDark)
+    // Keep the browser canvas covered while client-side navigation swaps CSS.
+    root.style.backgroundColor = isDark ? darkMode : lightMode
+
+    // Update meta theme-color tag
+    const metaThemeColor = doc.head.querySelector('meta[name="theme-color"]')
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', isDark ? darkMode : lightMode)
+    }
+  }
+
+  // Check and init the project-level motion preference.
+  function initMotionPref(doc = document) {
+    const shouldReduceMotion = reduceMotion
+
+    doc.documentElement.classList.toggle('reduce-motion', shouldReduceMotion)
+  }
+
+  // Update theme before page transition to prevent flashing
+  document.addEventListener('astro:before-swap', ({ newDocument }) => {
+    initTheme(newDocument)
+    initMotionPref(newDocument)
+  })
+
+  // Initialize theme on first load
+  initTheme()
+  initMotionPref()
+})()
+</script>
+
+<!-- Google Analytics -->
+<!-- Define gtag on window object for proper Partytown forwarding -->
+<!-- See https://github.com/QwikDev/partytown/issues/382 -->
+{googleAnalyticsID && (
+  <>
+    <script
+      is:inline
+      type="text/partytown"
+      src={customGoogleAnalyticsJS || `https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsID}`}
+    />
+    <script
+      is:inline
+      type="text/partytown"
+      define:vars={{
+        googleAnalyticsID,
+        customGoogleAnalyticsJS,
+      }}
+    >
+      window.dataLayer = window.dataLayer || []
+      window.gtag = function () {
+        // eslint-disable-next-line prefer-rest-params
+        dataLayer.push(arguments)
+      }
+      window.gtag('js', new Date())
+
+      if (customGoogleAnalyticsJS) {
+        window.gtag('config', googleAnalyticsID, {
+          transport_url: new URL(customGoogleAnalyticsJS).origin,
+        })
+      }
+      else {
+        window.gtag('config', googleAnalyticsID)
+      }
+    </script>
+  </>
+)}
+
+<!-- Umami Analytics -->
+{umamiAnalyticsID && (
+  <script
+    is:inline
+    type="text/partytown"
+    src={customUmamiAnalyticsJS || 'https://cloud.umami.is/script.js'}
+    data-website-id={umamiAnalyticsID}
+  />
+)}
+</head>

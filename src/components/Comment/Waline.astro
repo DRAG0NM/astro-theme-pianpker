@@ -1,0 +1,149 @@
+---
+import walineJS from '@waline/client/full?url'
+import walineCSS from '@waline/client/style?url'
+import { allLocales, base, defaultLocale, themeConfig } from '@/config'
+import { walineLocaleMap } from '@/i18n/config'
+
+const {
+  serverURL = '',
+  emoji = [],
+  search = false,
+  imageUploader = false,
+} = themeConfig.comment.waline ?? {}
+
+// Remove locale prefix from path
+const currentPath = Astro.url.pathname
+const localePattern = new RegExp(`\\/(${allLocales.join('|')})\\/`)
+const walinePath = currentPath.replace(localePattern, '/')
+
+// Determine language
+const pathWithoutBase = base && currentPath.startsWith(base)
+  ? currentPath.slice(base.length)
+  : currentPath
+const matchedLang = Object.keys(walineLocaleMap).find(code => pathWithoutBase.startsWith(`/${code}/`))
+const lang = (matchedLang ?? defaultLocale) as keyof typeof walineLocaleMap
+
+const walineConfig = {
+  serverURL,
+  path: walinePath,
+  lang: walineLocaleMap[lang],
+  emoji,
+  search,
+  imageUploader,
+  walineJS,
+  walineCSS,
+}
+---
+
+<div
+  id="waline"
+  class="no-heti mt-16"
+  data-config={JSON.stringify(walineConfig)}
+/>
+
+<!-- Waline Script >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+<script>
+import type { WalineInstance } from '@waline/client'
+
+let walineObserver: IntersectionObserver | null = null
+let walineInstance: WalineInstance | null = null
+
+async function setupWaline() {
+  const walineContainer = document.getElementById('waline')
+  if (!walineContainer || !walineContainer.dataset.config) {
+    return
+  }
+
+  try {
+    const config = JSON.parse(walineContainer.dataset.config)
+    const { walineJS, walineCSS, ...restConfig } = config
+    const { init } = await import(/* @vite-ignore */ walineJS)
+
+    walineInstance = init({
+      el: '#waline',
+      dark: 'html.dark',
+      requiredMeta: ['nick', 'mail'],
+      highlighter: false,
+      texRenderer: false,
+      noCopyright: true,
+      reaction: [],
+      ...restConfig,
+    })
+  }
+  catch (error) {
+    console.error('[Waline] Failed to initialize:', error)
+  }
+}
+
+// Lazy load Waline when the container enters viewport
+function lazySetupWaline() {
+  const walineContainer = document.getElementById('waline')
+  if (!walineContainer || !walineContainer.dataset.config) {
+    return
+  }
+
+  const config = JSON.parse(walineContainer.dataset.config)
+  const { walineCSS } = config
+
+  if (!document.getElementById('waline-css')) {
+    const link = document.createElement('link')
+    link.id = 'waline-css'
+    link.rel = 'stylesheet'
+    link.href = walineCSS
+    document.head.appendChild(link)
+  }
+
+  walineObserver = new IntersectionObserver((entries) => {
+    if (entries.some(entry => entry.isIntersecting)) {
+      setupWaline()
+      walineObserver?.disconnect()
+      walineObserver = null
+    }
+  }, { rootMargin: '500px' })
+
+  walineObserver.observe(walineContainer)
+}
+
+function cleanupWaline() {
+  walineObserver?.disconnect()
+  walineObserver = null
+  walineInstance?.destroy?.()
+  walineInstance = null
+}
+
+document.addEventListener('astro:page-load', lazySetupWaline)
+document.addEventListener('astro:before-swap', cleanupWaline)
+</script>
+
+<!-- Official CSS Variables >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+<style>
+#waline {
+  /* Regular Colors */
+  --waline-white: oklch(var(--un-preset-theme-colors-background));
+  --waline-light-grey: oklch(var(--un-preset-theme-colors-primary) / 0.25);
+  --waline-dark-grey: oklch(var(--un-preset-theme-colors-secondary));
+
+  /* Theme Colors */
+  --waline-theme-color: oklch(var(--un-preset-theme-colors-primary));
+  --waline-active-color: oklch(var(--un-preset-theme-colors-primary));
+
+  /* Layout Colors */
+  --waline-color: oklch(var(--un-preset-theme-colors-secondary));
+  --waline-bg-color: oklch(var(--un-preset-theme-colors-background));
+  --waline-bg-color-light: oklch(var(--un-preset-theme-colors-background));
+  --waline-bg-color-hover: oklch(var(--un-preset-theme-colors-background));
+  --waline-border-color: oklch(var(--un-preset-theme-colors-primary) / 0.25);
+  --waline-disable-bg-color: oklch(var(--un-preset-theme-colors-secondary) / 0.05);
+  --waline-disable-color: oklch(var(--un-preset-theme-colors-primary));
+
+  /* Special Colors */
+  --waline-bq-color: oklch(var(--un-preset-theme-colors-primary) / 0.25);
+
+  /* Information */
+  --waline-info-bg-color: oklch(var(--un-preset-theme-colors-background));
+  --waline-info-color: oklch(var(--un-preset-theme-colors-primary) / 0.25);
+
+  /* Rendering Options */
+  --waline-avatar-radius: 0.5rem;
+}
+</style>

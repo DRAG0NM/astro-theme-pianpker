@@ -1,0 +1,119 @@
+---
+import { base, defaultLocale, themeConfig } from '@/config'
+import { giscusLocaleMap } from '@/i18n/config'
+
+const {
+  repo = '',
+  repoId = '',
+  category = '',
+  categoryId = '',
+  mapping = 'pathname',
+  strict = '0',
+  reactionsEnabled = '1',
+  emitMetadata = '0',
+  inputPosition = 'bottom',
+} = themeConfig.comment.giscus ?? {}
+
+
+const currentPath = Astro.url.pathname
+
+// Determine language
+const pathWithoutBase = base && currentPath.startsWith(base)
+  ? currentPath.slice(base.length)
+  : currentPath
+const matchedLang = Object.keys(giscusLocaleMap).find(code => pathWithoutBase.startsWith(`/${code}/`))
+const lang = (matchedLang ?? defaultLocale) as keyof typeof giscusLocaleMap
+
+const giscusConfig = {
+  repo,
+  repoId,
+  category,
+  categoryId,
+  mapping,
+  strict,
+  reactionsEnabled,
+  emitMetadata,
+  inputPosition,
+  lang: giscusLocaleMap[lang],
+}
+---
+
+<div
+  id="giscus"
+  class="giscus mt-16"
+  data-config={JSON.stringify(giscusConfig)}
+/>
+
+<!-- Giscus Script >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+<script>
+let giscusContainer: HTMLElement | null = null
+
+function getThemeUrl() {
+  const isDark = document.documentElement.classList.contains('dark')
+  return isDark
+    ? `https://pianpker.pages.dev/giscus/theme-dark.css`
+    : `https://pianpker.pages.dev/giscus/theme-light.css`
+}
+
+function updateGiscusTheme() {
+  if (!giscusContainer || !giscusContainer.dataset.config) {
+    return
+  }
+
+  const giscusWindow = giscusContainer.querySelector<HTMLIFrameElement>('iframe.giscus-frame')?.contentWindow
+  if (!giscusWindow) {
+    return
+  }
+
+  try {
+    giscusWindow.postMessage(
+      { giscus: { setConfig: { theme: getThemeUrl() } } },
+      'https://giscus.app',
+    )
+  }
+  catch (error) {
+    console.error('[Giscus] Failed to update theme:', error)
+  }
+}
+
+function setupGiscus() {
+  giscusContainer = document.getElementById('giscus')
+  if (!giscusContainer || !giscusContainer.dataset.config) {
+    return
+  }
+
+  giscusContainer.innerHTML = ''
+
+  try {
+    const config = JSON.parse(giscusContainer.dataset.config)
+    const { category, ...restConfig } = config
+
+    const dataAttributes: Record<string, string> = {
+      ...restConfig,
+      ...(category && { category }),
+      theme: getThemeUrl(),
+    }
+
+    const script = document.createElement('script')
+    script.crossOrigin = 'anonymous'
+    script.async = true
+    Object.assign(script.dataset, dataAttributes)
+    script.src = 'https://giscus.app/client.js'
+    giscusContainer.appendChild(script)
+  }
+  catch (error) {
+    console.error('[Giscus] Failed to initialize:', error)
+  }
+}
+
+function cleanupGiscus() {
+  if (giscusContainer) {
+    giscusContainer.innerHTML = ''
+    giscusContainer = null
+  }
+}
+
+document.addEventListener('astro:page-load', setupGiscus)
+document.addEventListener('astro:before-swap', cleanupGiscus)
+document.addEventListener('theme-changed', updateGiscusTheme)
+</script>
