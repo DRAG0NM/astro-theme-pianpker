@@ -14,6 +14,7 @@ pnpm-debug.log*
 
 # local validation artifacts and design backups
 tmp/
+.local-design/
 public/icons/1og-logo.png
 
 # environment variables

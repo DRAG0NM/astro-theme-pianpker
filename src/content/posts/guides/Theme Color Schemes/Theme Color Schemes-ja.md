@@ -1,21 +1,21 @@
 ---
-title: Schémas de couleurs du thème
+title: テーマカラースキーム
 published: 2025-04-11
 tags:
-  - Guide
+  - ガイド
 toc: false
-lang: fr
+lang: ja
 abbrlink: theme-color-schemes
 ---
 
-Pianpker utilise l’espace colorimétrique [OKLCH](https://oklch.com/) pour composer une palette sobre de papier chaud, de nuances d’encre et d’accents vermillon. En mode sombre, le papier devient une encre profonde et le vermillon perd en saturation pour préserver le confort de lecture.
+Pianpker は [OKLCH](https://oklch.com/) カラースペースを用い、温かな紙色、墨の濃淡、控えめな朱色で配色を構成します。暗色モードでは紙面を深い墨色へ移し、朱色の彩度を抑えることで長文の読みやすさを保ちます。
 
-Pour répondre aux besoins de personnalisation, j’ai créé plusieurs schémas de couleurs pour le thème. Vous pouvez remplacer le schéma par défaut dans [src/config.ts](https://github.com/DRAG0NM/astro-theme-pianpker/blob/main/src/config.ts), puis redémarrer le serveur de développement pour prévisualiser le nouveau schéma.
+個性的なニーズに応えるため、テーマ用にいくつかの配色スキームを作成しました。[src/config.ts](https://github.com/DRAG0NM/astro-theme-pianpker/blob/main/src/config.ts) でデフォルトの配色を置き換え、開発サーバーを再起動して新しい配色をプレビューできます。
 
-## Blanc ciboulette
+## 葱白色
 
-![Mode clair](../_images/1-light.jpeg)
-![Mode sombre](../_images/1-dark.jpeg)
+![Light mode](../../_images/1-light.jpeg)
+![Dark mode](../../_images/1-dark.jpeg)
 
 ```
 light: {
@@ -32,10 +32,10 @@ dark: {
 },
 ```
 
-## Bleu corbeau
+## 烏青
 
-![Mode clair](../_images/2-light.jpeg)
-![Mode sombre](../_images/2-dark.jpeg)
+![Light mode](../../_images/2-light.jpeg)
+![Dark mode](../../_images/2-dark.jpeg)
 
 ```
 light: {
@@ -52,10 +52,10 @@ dark: {
 },
 ```
 
-## Bleu d’encre
+## 墨藍
 
-![Mode clair](../_images/4-light.jpeg)
-![Mode sombre](../_images/4-dark.jpeg)
+![Light mode](../../_images/4-light.jpeg)
+![Dark mode](../../_images/4-dark.jpeg)
 
 ```
 light: {
@@ -72,10 +72,10 @@ dark: {
 },
 ```
 
-## Beige
+## 米色
 
-![Mode clair](../_images/3-light.jpeg)
-![Mode sombre](../_images/3-dark.jpeg)
+![Light mode](../../_images/3-light.jpeg)
+![Dark mode](../../_images/3-dark.jpeg)
 
 ```
 light: {

@@ -1,21 +1,21 @@
 ---
-title: 主題配色指南
+title: Theme Color Schemes
 published: 2025-04-11
 tags:
-  - 指南
+  - Guide
 toc: false
-lang: zh-tw
+lang: en
 abbrlink: theme-color-schemes
 ---
 
-Pianpker 使用 [OKLCH](https://oklch.com/) 顏色空間建立克制的和紙、墨色與朱紅體系。明亮模式以暖紙承載分層墨色；暗夜模式轉為深墨底，並降低朱紅飽和度，以維持長文閱讀的舒適度。
+Pianpker uses the [OKLCH](https://oklch.com/) color space to build a restrained palette of warm paper, layered ink, and vermilion accents. Dark mode shifts the paper ground to deep ink and lowers the saturation of vermilion for comfortable reading.
 
-為滿足個性化需求，我為主題製作了一些配色方案。你可以在 [src/config.ts](https://github.com/DRAG0NM/astro-theme-pianpker/blob/main/src/config.ts) 中替換預設配色，並重新啟動開發伺服器以預覽新配色。
+To meet personalization needs, I've created several color schemes for the theme. You can replace the default color scheme in [src/config.ts](https://github.com/DRAG0NM/astro-theme-pianpker/blob/main/src/config.ts) and restart the development server to preview the new color scheme.
 
-## 蔥白
+## Scallion White
 
-![Light mode](../_images/1-light.jpeg)
-![Dark mode](../_images/1-dark.jpeg)
+![Light mode](../../_images/1-light.jpeg)
+![Dark mode](../../_images/1-dark.jpeg)
 
 ```
 light: {
@@ -32,10 +32,10 @@ dark: {
 },
 ```
 
-## 鴉青
+## Raven Teal
 
-![Light mode](../_images/2-light.jpeg)
-![Dark mode](../_images/2-dark.jpeg)
+![Light mode](../../_images/2-light.jpeg)
+![Dark mode](../../_images/2-dark.jpeg)
 
 ```
 light: {
@@ -52,10 +52,10 @@ dark: {
 },
 ```
 
-## 墨藍
+## Ink Blue
 
-![Light mode](../_images/4-light.jpeg)
-![Dark mode](../_images/4-dark.jpeg)
+![Light mode](../../_images/4-light.jpeg)
+![Dark mode](../../_images/4-dark.jpeg)
 
 ```
 light: {
@@ -72,10 +72,10 @@ dark: {
 },
 ```
 
-## 米黃
+## Ecru
 
-![Light mode](../_images/3-light.jpeg)
-![Dark mode](../_images/3-dark.jpeg)
+![Light mode](../../_images/3-light.jpeg)
+![Dark mode](../../_images/3-dark.jpeg)
 
 ```
 light: {

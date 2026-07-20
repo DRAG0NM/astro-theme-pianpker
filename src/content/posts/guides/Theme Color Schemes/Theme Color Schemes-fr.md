@@ -1,21 +1,21 @@
 ---
-title: Theme Color Schemes
+title: Schémas de couleurs du thème
 published: 2025-04-11
 tags:
   - Guide
 toc: false
-lang: en
+lang: fr
 abbrlink: theme-color-schemes
 ---
 
-Pianpker uses the [OKLCH](https://oklch.com/) color space to build a restrained palette of warm paper, layered ink, and vermilion accents. Dark mode shifts the paper ground to deep ink and lowers the saturation of vermilion for comfortable reading.
+Pianpker utilise l’espace colorimétrique [OKLCH](https://oklch.com/) pour composer une palette sobre de papier chaud, de nuances d’encre et d’accents vermillon. En mode sombre, le papier devient une encre profonde et le vermillon perd en saturation pour préserver le confort de lecture.
 
-To meet personalization needs, I've created several color schemes for the theme. You can replace the default color scheme in [src/config.ts](https://github.com/DRAG0NM/astro-theme-pianpker/blob/main/src/config.ts) and restart the development server to preview the new color scheme.
+Pour répondre aux besoins de personnalisation, j’ai créé plusieurs schémas de couleurs pour le thème. Vous pouvez remplacer le schéma par défaut dans [src/config.ts](https://github.com/DRAG0NM/astro-theme-pianpker/blob/main/src/config.ts), puis redémarrer le serveur de développement pour prévisualiser le nouveau schéma.
 
-## Scallion White
+## Blanc ciboulette
 
-![Light mode](../_images/1-light.jpeg)
-![Dark mode](../_images/1-dark.jpeg)
+![Mode clair](../../_images/1-light.jpeg)
+![Mode sombre](../../_images/1-dark.jpeg)
 
 ```
 light: {
@@ -32,10 +32,10 @@ dark: {
 },
 ```
 
-## Raven Teal
+## Bleu corbeau
 
-![Light mode](../_images/2-light.jpeg)
-![Dark mode](../_images/2-dark.jpeg)
+![Mode clair](../../_images/2-light.jpeg)
+![Mode sombre](../../_images/2-dark.jpeg)
 
 ```
 light: {
@@ -52,10 +52,10 @@ dark: {
 },
 ```
 
-## Ink Blue
+## Bleu d’encre
 
-![Light mode](../_images/4-light.jpeg)
-![Dark mode](../_images/4-dark.jpeg)
+![Mode clair](../../_images/4-light.jpeg)
+![Mode sombre](../../_images/4-dark.jpeg)
 
 ```
 light: {
@@ -72,10 +72,10 @@ dark: {
 },
 ```
 
-## Ecru
+## Beige
 
-![Light mode](../_images/3-light.jpeg)
-![Dark mode](../_images/3-dark.jpeg)
+![Mode clair](../../_images/3-light.jpeg)
+![Mode sombre](../../_images/3-dark.jpeg)
 
 ```
 light: {

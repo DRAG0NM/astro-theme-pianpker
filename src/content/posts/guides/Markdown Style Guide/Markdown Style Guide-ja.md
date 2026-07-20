@@ -61,7 +61,7 @@ abbrlink: markdown-style-guide
 ### 構文
 
 ```
-![画像の説明](../_images/image-01.jpeg)
+![画像の説明](../../_images/image-01.jpeg)
 
 ![画像の説明](https://image.example.com/image-01.webp)
 ```

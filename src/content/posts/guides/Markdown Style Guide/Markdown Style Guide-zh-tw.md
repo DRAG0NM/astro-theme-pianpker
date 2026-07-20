@@ -61,7 +61,7 @@ abbrlink: markdown-style-guide
 ### 語法
 
 ```
-![圖片描述](../_images/image-01.jpeg)
+![圖片描述](../../_images/image-01.jpeg)
 
 ![圖片描述](https://image.example.com/image-01.webp)
 ```

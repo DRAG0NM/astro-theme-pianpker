@@ -1,21 +1,21 @@
 ---
-title: Цветовые Схемы Темы
+title: 主题配色指南
 published: 2025-04-11
 tags:
-  - Руководство
+  - 指南
 toc: false
-lang: ru
+lang: zh
 abbrlink: theme-color-schemes
 ---
 
-Pianpker использует цветовое пространство [OKLCH](https://oklch.com/) для сдержанной палитры из тёплой бумаги, оттенков туши и киноварных акцентов. В тёмном режиме бумажный фон становится глубоким чернильным, а насыщенность киновари снижается для комфортного чтения.
+Pianpker 使用 [OKLCH](https://oklch.com/) 颜色空间建立克制的和纸、墨色与朱红体系。明亮模式以暖纸承载分层墨色；暗夜模式转为深墨底，并降低朱红饱和度，以保证长文阅读的舒适度。
 
-Для удовлетворения потребностей в персонализации я создал несколько цветовых схем для темы. Вы можете заменить стандартную цветовую схему в [src/config.ts](https://github.com/DRAG0NM/astro-theme-pianpker/blob/main/src/config.ts) и перезапустить сервер разработки, чтобы просмотреть новую цветовую схему.
+为满足个性化需求，我为主题制作了一些配色方案。你可以在 [src/config.ts](https://github.com/DRAG0NM/astro-theme-pianpker/blob/main/src/config.ts) 中替换默认配色，并重启开发服务器以预览新配色。
 
-## Бледно-зелёный
+## 葱白
 
-![Light mode](../_images/1-light.jpeg)
-![Dark mode](../_images/1-dark.jpeg)
+![Light mode](../../_images/1-light.jpeg)
+![Dark mode](../../_images/1-dark.jpeg)
 
 ```
 light: {
@@ -32,10 +32,10 @@ dark: {
 },
 ```
 
-## Воронёный
+## 鸦青
 
-![Light mode](../_images/2-light.jpeg)
-![Dark mode](../_images/2-dark.jpeg)
+![Light mode](../../_images/2-light.jpeg)
+![Dark mode](../../_images/2-dark.jpeg)
 
 ```
 light: {
@@ -52,10 +52,10 @@ dark: {
 },
 ```
 
-## Чернильно-синий
+## 墨蓝
 
-![Light mode](../_images/4-light.jpeg)
-![Dark mode](../_images/4-dark.jpeg)
+![Light mode](../../_images/4-light.jpeg)
+![Dark mode](../../_images/4-dark.jpeg)
 
 ```
 light: {
@@ -72,10 +72,10 @@ dark: {
 },
 ```
 
-## Кремовый
+## 米黄
 
-![Light mode](../_images/3-light.jpeg)
-![Dark mode](../_images/3-dark.jpeg)
+![Light mode](../../_images/3-light.jpeg)
+![Dark mode](../../_images/3-dark.jpeg)
 
 ```
 light: {

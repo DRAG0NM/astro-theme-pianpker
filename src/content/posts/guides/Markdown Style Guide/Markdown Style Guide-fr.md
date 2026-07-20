@@ -61,7 +61,7 @@ Pour ajouter une image, placez un point d’exclamation `!`, suivi d’un texte 
 ### Syntaxe
 
 ```
-![Description de l’image](../_images/image-01.jpeg)
+![Description de l’image](../../_images/image-01.jpeg)
 
 ![Description de l’image](https://image.example.com/image-01.webp)
 ```

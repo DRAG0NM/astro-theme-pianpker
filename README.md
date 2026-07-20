@@ -62,12 +62,34 @@ Open `http://localhost:4321/` after the development server starts.
 | Path | Purpose |
 | --- | --- |
 | [`src/config.ts`](src/config.ts) | Site identity, languages, theme, SEO, comments, and footer links |
-| [`src/content/posts/`](src/content/posts/) | Posts, examples, and localized guides |
+| [`src/content/posts/`](src/content/posts/) | Posts grouped by category and English article title |
 | [`src/content/about/`](src/content/about/) | Localized About pages |
 | [`public/icons/`](public/icons/) | Favicon and Open Graph logo |
 | [`public/fonts/`](public/fonts/) | Local fonts and font subsets |
 
-Start with the [Theme Guide](src/content/posts/guides/Theme%20Guide-en.md) before changing routing, transitions, font loading, or Markdown plugins.
+Start with the [Theme Guide](src/content/posts/guides/Theme%20Guide/Theme%20Guide-en.md) before changing routing, transitions, font loading, or Markdown plugins.
+
+## Content Organization
+
+Keep every translation of an article in one folder named after its English title. The localized files must share the same `abbrlink`, which keeps their public URL and language-switching relationship stable:
+
+```text
+src/content/posts/articles/Quiet Summer Night/
+├─ quiet-summer-night-zh.md
+├─ quiet-summer-night-zh-tw.md
+├─ quiet-summer-night-en.md
+├─ quiet-summer-night-fr.md
+├─ quiet-summer-night-ja.md
+└─ quiet-summer-night-ru.md
+```
+
+Create the first localized file with:
+
+```bash
+pnpm new-post "Quiet Summer Night" zh articles
+```
+
+The command creates the English-title folder, assigns the selected language, and generates a stable `abbrlink`. Run it again with another supported language to add a translation, then replace the generated frontmatter title with the localized display title. Local article images may remain in `src/content/posts/_images/`; use a relative path matching the article folder depth.
 
 ## Verification
 

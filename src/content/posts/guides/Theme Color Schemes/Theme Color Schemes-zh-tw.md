@@ -1,21 +1,21 @@
 ---
-title: テーマカラースキーム
+title: 主題配色指南
 published: 2025-04-11
 tags:
-  - ガイド
+  - 指南
 toc: false
-lang: ja
+lang: zh-tw
 abbrlink: theme-color-schemes
 ---
 
-Pianpker は [OKLCH](https://oklch.com/) カラースペースを用い、温かな紙色、墨の濃淡、控えめな朱色で配色を構成します。暗色モードでは紙面を深い墨色へ移し、朱色の彩度を抑えることで長文の読みやすさを保ちます。
+Pianpker 使用 [OKLCH](https://oklch.com/) 顏色空間建立克制的和紙、墨色與朱紅體系。明亮模式以暖紙承載分層墨色；暗夜模式轉為深墨底，並降低朱紅飽和度，以維持長文閱讀的舒適度。
 
-個性的なニーズに応えるため、テーマ用にいくつかの配色スキームを作成しました。[src/config.ts](https://github.com/DRAG0NM/astro-theme-pianpker/blob/main/src/config.ts) でデフォルトの配色を置き換え、開発サーバーを再起動して新しい配色をプレビューできます。
+為滿足個性化需求，我為主題製作了一些配色方案。你可以在 [src/config.ts](https://github.com/DRAG0NM/astro-theme-pianpker/blob/main/src/config.ts) 中替換預設配色，並重新啟動開發伺服器以預覽新配色。
 
-## 葱白色
+## 蔥白
 
-![Light mode](../_images/1-light.jpeg)
-![Dark mode](../_images/1-dark.jpeg)
+![Light mode](../../_images/1-light.jpeg)
+![Dark mode](../../_images/1-dark.jpeg)
 
 ```
 light: {
@@ -32,10 +32,10 @@ dark: {
 },
 ```
 
-## 烏青
+## 鴉青
 
-![Light mode](../_images/2-light.jpeg)
-![Dark mode](../_images/2-dark.jpeg)
+![Light mode](../../_images/2-light.jpeg)
+![Dark mode](../../_images/2-dark.jpeg)
 
 ```
 light: {
@@ -54,8 +54,8 @@ dark: {
 
 ## 墨藍
 
-![Light mode](../_images/4-light.jpeg)
-![Dark mode](../_images/4-dark.jpeg)
+![Light mode](../../_images/4-light.jpeg)
+![Dark mode](../../_images/4-dark.jpeg)
 
 ```
 light: {
@@ -72,10 +72,10 @@ dark: {
 },
 ```
 
-## 米色
+## 米黃
 
-![Light mode](../_images/3-light.jpeg)
-![Dark mode](../_images/3-dark.jpeg)
+![Light mode](../../_images/3-light.jpeg)
+![Dark mode](../../_images/3-dark.jpeg)
 
 ```
 light: {
